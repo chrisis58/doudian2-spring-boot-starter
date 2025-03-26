@@ -12,9 +12,13 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 public @interface OpParam {
-    String name();
+    @AliasFor("method")
+    String value() default "";
 
-    String method();
+    String name() default "";
+
+    @AliasFor("value")
+    String method() default "";
 
     boolean needToken() default true;
 
