@@ -1,0 +1,65 @@
+package cn.teacy.doudian.service;
+
+import cn.hutool.extra.spring.SpringUtil;
+import cn.teacy.common.annotation.OpParam;
+import cn.teacy.common.doudian.api.ApiRequest;
+import cn.teacy.common.interfaces.ISignService;
+import cn.teacy.common.property.DoudianProperties;
+import cn.teacy.common.util.MarshalUtil;
+import cn.teacy.common.util.SignUtil;
+import cn.teacy.doudian.token.AccessTokenRetriever;
+import lombok.RequiredArgsConstructor;
+
+import java.util.Objects;
+import java.util.Optional;
+
+@RequiredArgsConstructor
+public class DoudianSignService implements ISignService {
+
+    private final DoudianProperties doudianProperties;
+
+    /**
+     * 对 api 参数进行签名
+     * 会修改原有对象，返回签名后的对象
+     */
+    public <P> ApiRequest<P> sign(ApiRequest<P> apiRequest) {
+
+        apiRequest.setAppKey(doudianProperties.getAppKey());
+        apiRequest.setSignMethod("hmac-sha256");
+        apiRequest.setTimestamp(
+                Long.toString(System.currentTimeMillis() / 1000)
+        );
+
+        apiRequest.setV(doudianProperties.getVersion());
+
+        apiRequest.setSign(
+                SignUtil.sign(
+                        doudianProperties.getAppKey(),
+                        doudianProperties.getAppSecret(),
+                        apiRequest.getMethod(),
+                        apiRequest.getTimestamp(),
+                        MarshalUtil.marshal(apiRequest.getParam())
+                )
+        );
+
+        if (Optional.ofNullable(apiRequest.getParam().getClass().getAnnotation(OpParam.class)).map(OpParam::needToken).orElse(true)) {
+            // 默认都需要token
+            // 这里使用 SpringUtil 来获取 AccessTokenRetriever 的实例，避免循环依赖
+            AccessTokenRetriever retriever = SpringUtil.getBean(AccessTokenRetriever.class);
+
+            apiRequest.setAccessToken(retriever.retrieveToken());
+        }
+
+        return apiRequest;
+    }
+
+    public <P> ApiRequest<P> sign(P apiParam) {
+        String method = Objects.requireNonNull(
+                Optional.ofNullable(apiParam.getClass().getAnnotation(OpParam.class)).map(OpParam::method).orElse(null),
+                "使用此方法的 IApiParam 必须使用 @OpParam 注解， 如果没有请使用 sign(String method, IApiParam param) 方法"
+        );
+
+        return sign(new ApiRequest<>(method, apiParam));
+    }
+
+}
