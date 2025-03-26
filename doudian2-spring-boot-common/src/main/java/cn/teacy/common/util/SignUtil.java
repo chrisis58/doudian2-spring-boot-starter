@@ -22,8 +22,6 @@ public class SignUtil {
         // 按给定规则拼接参数
         String paramPattern = "app_key" + appKey + "method" + method + "param_json" + paramJson + "timestamp" + timestamp + "v2";
         String signPattern = appSecret + paramPattern + appSecret;
-        System.out.println(signPattern);
-        log.debug("Sign pattern: {}", signPattern);
 
         return hmac(signPattern, appSecret);
     }
