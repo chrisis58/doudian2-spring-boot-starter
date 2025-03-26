@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 @NoArgsConstructor
 @RequiredArgsConstructor
 @OpParam(
-        name = "创建token请求参数",
+        value = "token.create",
         method = "token.create",
         needToken = false
 )

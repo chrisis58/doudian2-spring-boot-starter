@@ -2,7 +2,6 @@ package cn.teacy.doudian.domain.request;
 
 import cn.teacy.common.annotation.OpField;
 import cn.teacy.common.annotation.OpParam;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +12,7 @@ import lombok.experimental.SuperBuilder;
 @RequiredArgsConstructor
 @SuperBuilder
 @OpParam(
-        name = "刷新token请求参数",
+        value = "token.refresh",
         method = "token.refresh",
         needToken = false
 )
