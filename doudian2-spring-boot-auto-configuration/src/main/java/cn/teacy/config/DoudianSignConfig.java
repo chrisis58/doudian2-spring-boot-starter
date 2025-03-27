@@ -1,7 +1,9 @@
 package cn.teacy.config;
 
 import cn.teacy.common.interfaces.ISignService;
+import cn.teacy.common.property.DoudianApiProperties;
 import cn.teacy.common.property.DoudianProperties;
+import cn.teacy.common.property.DoudianTokenRetrieverProperties;
 import cn.teacy.doudian.client.CommonClient;
 import cn.teacy.doudian.service.DoudianSignService;
 import cn.teacy.doudian.token.AccessTokenHolder;
@@ -24,11 +26,9 @@ import org.springframework.context.annotation.Primary;
         after = {DoudianDefaultConfig.class}
 )
 @RequiredArgsConstructor
-@EnableConfigurationProperties(DoudianProperties.class)
+@EnableConfigurationProperties({DoudianProperties.class, DoudianTokenRetrieverProperties.class, DoudianApiProperties.class})
 @EnableFeignClients(basePackages = "cn.teacy")
 public class DoudianSignConfig {
-
-    private final DoudianProperties doudianProperties;
 
     @Bean
     @ConditionalOnMissingBean
@@ -36,19 +36,21 @@ public class DoudianSignConfig {
             AccessTokenHolder accessTokenHolder,
             RefreshTokenHolder refreshTokenHolder,
             CommonClient commonClient,
-            DoudianProperties doudianProperties
+            DoudianTokenRetrieverProperties doudianTokenRetrieverProperties
     ) {
         return new AccessTokenRetriever.DEFAULT(
                 accessTokenHolder,
                 refreshTokenHolder,
                 commonClient,
-                doudianProperties.getAuthId()
+                doudianTokenRetrieverProperties
         );
     }
 
     @Bean
     @Primary
-    public ISignService signService() {
+    public ISignService signService(
+            DoudianProperties doudianProperties
+    ) {
         return new DoudianSignService(
                 doudianProperties
         );

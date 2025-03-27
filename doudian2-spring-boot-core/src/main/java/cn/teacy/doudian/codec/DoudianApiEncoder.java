@@ -1,11 +1,9 @@
 package cn.teacy.doudian.codec;
 
 import cn.hutool.core.annotation.AnnotationUtil;
-import cn.hutool.extra.spring.SpringUtil;
 import cn.teacy.common.annotation.OpParam;
 import cn.teacy.common.doudian.api.ApiRequest;
 import cn.teacy.common.interfaces.ISignService;
-import cn.teacy.doudian.token.AccessTokenRetriever;
 import feign.RequestTemplate;
 import feign.codec.EncodeException;
 import feign.codec.Encoder;

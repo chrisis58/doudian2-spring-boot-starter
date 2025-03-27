@@ -15,12 +15,8 @@ public class DoudianProperties {
 
     private String appSecret;
 
-    private String authId;
-
     private String version = "2";
 
     private String[] additionalPackages = {};
-
-    private String[] requestHeaders = {};
 
 }
