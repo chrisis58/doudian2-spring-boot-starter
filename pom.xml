@@ -12,6 +12,21 @@
         Spring Boot SDK for DouDian V2
     </description>
 
+    <developers>
+        <developer>
+            <name>chris zheng</name>
+            <email>chrisis58@outlook.com</email>
+            <url>https://github.com/chrisis58</url>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+        </license>
+    </licenses>
+
     <modules>
         <module>doudian2-spring-boot-core</module>
         <module>doudian2-spring-boot-common</module>
