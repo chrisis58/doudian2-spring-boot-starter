@@ -6,7 +6,7 @@ public interface ApiResponseConstant {
         /**
          * 成功
          */
-        Integer OK = 0;
+        Integer OK = 10000;
 
         /**
          * 通用参数错误
