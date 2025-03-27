@@ -40,6 +40,7 @@ public interface ApiResponseConstant {
 
         /**
          * access_token不存在，请使用最新的access_token访问
+         * TODO: 这个好像是通用的参数错误码，而不仅仅是access_token不存在
          */
         Integer ACCESS_TOKEN_NOT_EXIST = 40003;
 
