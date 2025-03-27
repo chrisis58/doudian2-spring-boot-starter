@@ -22,6 +22,7 @@ public class SpiServiceRegistry {
     private static final ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
 
     private final Set<String> spiRoutes = new HashSet<>();
+    private final Set<Class<?>> responseClasses = new HashSet<>();
 
     public SpiServiceRegistry(String[] additionalPackages) {
         scanner.addIncludeFilter(new AnnotationTypeFilter(RestController.class));
@@ -33,8 +34,8 @@ public class SpiServiceRegistry {
             scanSpiEndpoints(additionalPackage);
         }
 
-        log.info("SPI endpoints registered: {}", spiRoutes);
-
+        log.info("{} SPI endpoints registered: {}", spiRoutes.size(), spiRoutes);
+        log.info("{} response classes registered: {}", responseClasses.size(), responseClasses);
     }
 
     private void scanSpiEndpoints(String basePackage) {
@@ -56,6 +57,7 @@ public class SpiServiceRegistry {
                             // 组合类级别和方法级别的路径，得到完整的路由
                             String route = classPath + mapping.value()[0];
                             spiRoutes.add(route);
+                            responseClasses.add(method.getReturnType());
                         }
                     }
                 }
