@@ -6,6 +6,11 @@ import cn.teacy.doudian.domain.api.request.*;
 import cn.teacy.doudian.domain.api.response.*;
 import org.springframework.web.bind.annotation.PostMapping;
 
+/**
+ * 二手奢侈品查验服务商接口文档
+ *
+ * @see <a href="https://bytedance.larkoffice.com/docx/VjoSdWkGgoJ1gyxvw93cDl7dn9e">查验服务商接口文档</a>
+ */
 @DoudianApiClient("luxury-inspection-apis")
 public interface LuxuryInspectionClient {
 
