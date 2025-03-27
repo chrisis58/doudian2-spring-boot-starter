@@ -2,4 +2,5 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 cn.teacy.config.DoudianDefaultConfig,\
 cn.teacy.config.DoudianJacksonConfig,\
 cn.teacy.config.DoudianSpiRegistryConfig,\
-cn.teacy.config.DoudianSignConfig
+cn.teacy.config.DoudianSignConfig,\
+cn.teacy.config.DoudianAspectConfig
