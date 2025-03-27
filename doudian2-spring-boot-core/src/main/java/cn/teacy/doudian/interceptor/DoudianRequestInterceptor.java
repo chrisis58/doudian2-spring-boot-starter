@@ -39,7 +39,7 @@ public class DoudianRequestInterceptor implements RequestInterceptor {
             ReUtil.findAll(TEMPLATE_PATTERN, wrapper.getValue(), (matcher) -> {
                 String group = matcher.group();
                 String eval = supplierRegistry.eval(group.substring(1, group.length() - 1));
-                wrapper.setValue(StrUtil.replace(value, group, eval));
+                wrapper.setValue(StrUtil.replace(wrapper.getValue(), group, eval));
             });
 
             requestTemplate.header(key, wrapper.getValue());
