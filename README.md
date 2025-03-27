@@ -71,6 +71,8 @@ doudian:
 
 ### 调用抖店 API
 
+#### 使用预设的包
+
 ```java
 @SpringBootTest
 class DemoApplicationTests {
@@ -90,6 +92,20 @@ class DemoApplicationTests {
 ```
 
 > 案例使用到了预设的包 `doudian2-second-hand-luxury-inspection`
+
+#### 自定义 API 客户端
+
+在主类上添加注解 `@EnableFeignClients`，然后编写自定义 API 客户端：
+
+```java
+@DoudianApiClient("demo-apis")
+public interface DemoClient {
+
+    @PostMapping("/inspection/inspectionTemplate/get")
+    CommonResponse<GetInspectionTemplateResponse> getInspectionTemplate(GetInspectionTemplateParam getInspectionTemplateParam);
+
+}
+```
 
 ### 注册 SPI（Service Provider Interface）
 
