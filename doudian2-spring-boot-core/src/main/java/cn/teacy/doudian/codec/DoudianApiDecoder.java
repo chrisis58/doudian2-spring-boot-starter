@@ -13,10 +13,12 @@ import feign.FeignException;
 import feign.Response;
 import feign.codec.Decoder;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 
+@Slf4j
 public class DoudianApiDecoder implements Decoder {
 
     private final ObjectMapper objectMapper;
@@ -46,6 +48,10 @@ public class DoudianApiDecoder implements Decoder {
                 return type;
             }
         });
+
+        if (!ApiResponseConstant.StatusCode.OK.equals(commonResponse.getCode())) {
+            log.warn("API response error: {}", commonResponse);
+        }
 
         if (ApiResponseConstant.StatusCode.ACCESS_TOKEN_NOT_EXIST.equals(commonResponse.getCode())) {
             accessTokenHolder.clear();
