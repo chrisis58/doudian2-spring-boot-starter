@@ -2,6 +2,7 @@ package cn.teacy.doudian.config;
 
 
 import cn.teacy.common.interfaces.ISignService;
+import cn.teacy.common.interfaces.SupplierRegistry;
 import cn.teacy.common.property.DoudianApiProperties;
 import cn.teacy.doudian.codec.DoudianApiDecoder;
 import cn.teacy.doudian.codec.DoudianApiEncoder;
@@ -26,9 +27,13 @@ public class DoudianApiClientConfig {
 
     @Bean
     public RequestInterceptor requestInterceptor(
-            DoudianApiProperties doudianApiProperties
+            DoudianApiProperties doudianApiProperties,
+            @Qualifier("requestHeadersSupplierRegistry")SupplierRegistry<String, String> supplierRegistry
     ) {
-        return new DoudianRequestInterceptor(doudianApiProperties.getRequestHeaders());
+        return new DoudianRequestInterceptor(
+                doudianApiProperties.getRequestHeaders(),
+                supplierRegistry
+        );
     }
 
     @Bean
