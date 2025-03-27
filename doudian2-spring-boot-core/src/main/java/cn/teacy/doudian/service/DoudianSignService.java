@@ -1,5 +1,6 @@
 package cn.teacy.doudian.service;
 
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.teacy.common.annotation.OpParam;
 import cn.teacy.common.doudian.api.ApiRequest;
@@ -9,6 +10,7 @@ import cn.teacy.common.util.MarshalUtil;
 import cn.teacy.common.util.SignUtil;
 import cn.teacy.doudian.token.AccessTokenRetriever;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.annotation.AnnotationUtils;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -55,9 +57,12 @@ public class DoudianSignService implements ISignService {
 
     public <P> ApiRequest<P> sign(P apiParam) {
         String method = Objects.requireNonNull(
-                Optional.ofNullable(apiParam.getClass().getAnnotation(OpParam.class)).map(OpParam::method).orElse(null),
+                Optional.ofNullable(AnnotationUtils.getAnnotation(apiParam.getClass(), OpParam.class)).map(OpParam::method).orElse(null),
                 "使用此方法的 IApiParam 必须使用 @OpParam 注解， 如果没有请使用 sign(String method, IApiParam param) 方法"
         );
+        if (StrUtil.isBlank(method)) {
+            throw new IllegalArgumentException("method 不能为空");
+        }
 
         return sign(new ApiRequest<>(method, apiParam));
     }

@@ -12,7 +12,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 public @interface OpParam {
-    @AliasFor("method")
     String value() default "";
 
     String name() default "";
