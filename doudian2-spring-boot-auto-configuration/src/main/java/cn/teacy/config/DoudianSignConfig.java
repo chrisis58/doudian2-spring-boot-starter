@@ -48,6 +48,7 @@ public class DoudianSignConfig {
 
     @Bean
     @Primary
+    @ConditionalOnMissingBean
     public ISignService signService(
             DoudianProperties doudianProperties
     ) {

@@ -46,7 +46,7 @@ public class DoudianDefaultConfig {
 
     @Bean
     @Qualifier("requestHeadersSupplierRegistry")
-    @ConditionalOnMissingBean
+    @ConditionalOnMissingBean(name = "requestHeadersSupplierRegistry")
     public SupplierRegistry<String, String> supplierRegistry() {
         HashSupplierRegistry<String, String> supplierRegistry = new HashSupplierRegistry<>();
 

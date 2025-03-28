@@ -21,7 +21,6 @@ import org.springframework.context.annotation.Bean;
 public class DoudianSpiConfig {
 
     @Bean
-    @ConditionalOnMissingBean
     public SpiServiceRegistry spiServiceRegistry(
             DoudianProperties doudianProperties
     ) {
