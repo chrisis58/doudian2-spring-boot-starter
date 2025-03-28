@@ -10,9 +10,8 @@ import cn.teacy.common.util.MarshalUtil;
 import cn.teacy.common.util.SignUtil;
 import cn.teacy.doudian.token.AccessTokenRetriever;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 
-import java.util.Objects;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -44,7 +43,11 @@ public class DoudianSignService implements ISignService {
                 )
         );
 
-        if (Optional.ofNullable(apiRequest.getParam().getClass().getAnnotation(OpParam.class)).map(OpParam::needToken).orElse(true)) {
+        if (Optional.ofNullable(
+                        AnnotatedElementUtils.findMergedAnnotation(apiRequest.getClass(), OpParam.class)
+                ).map(OpParam::needToken)
+                .orElse(true)
+        ) {
             // 默认都需要token
             // 这里使用 SpringUtil 来获取 AccessTokenRetriever 的实例，避免循环依赖
             AccessTokenRetriever retriever = SpringUtil.getBean(AccessTokenRetriever.class);
@@ -56,10 +59,13 @@ public class DoudianSignService implements ISignService {
     }
 
     public <P> ApiRequest<P> sign(P apiParam) {
-        String method = Objects.requireNonNull(
-                Optional.ofNullable(AnnotationUtils.getAnnotation(apiParam.getClass(), OpParam.class)).map(OpParam::method).orElse(null),
-                "使用此方法的 IApiParam 必须使用 @OpParam 注解， 如果没有请使用 sign(String method, IApiParam param) 方法"
-        );
+        String method = Optional.ofNullable(
+                        AnnotatedElementUtils.findMergedAnnotation(apiParam.getClass(), OpParam.class)
+                ).map(OpParam::method)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "使用此方法必须使用 @OpParam 注解，并提供 method 值"
+                ));
+
         if (StrUtil.isBlank(method)) {
             throw new IllegalArgumentException("method 不能为空");
         }

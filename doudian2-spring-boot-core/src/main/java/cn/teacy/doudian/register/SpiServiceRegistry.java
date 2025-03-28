@@ -1,17 +1,14 @@
 package cn.teacy.doudian.register;
 
 
-import cn.hutool.core.annotation.AnnotationUtil;
 import cn.teacy.common.annotation.SpiEndpoint;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.annotation.AnnotatedElementUtils;
-import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
