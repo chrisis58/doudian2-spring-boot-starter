@@ -1,9 +1,12 @@
 package cn.teacy.config;
 
 import cn.teacy.common.property.DoudianProperties;
+import cn.teacy.doudian.advice.SpiBodyAdvice;
 import cn.teacy.doudian.interceptor.SpiAuthInterceptor;
 import cn.teacy.doudian.persistent.SpiAccessLogPersistent;
 import cn.teacy.doudian.register.SpiServiceRegistry;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -36,6 +39,14 @@ public class DoudianSpiConfig {
                 doudianProperties.getAppSecret(),
                 spiAccessLogPersistent
         );
+    }
+
+    @Bean
+    public SpiBodyAdvice spiBodyAdvice(
+            ObjectMapper defaultObjectMapper,
+            @Qualifier("doudianObjectMapper") ObjectMapper doudianObjectMapper
+    ) {
+        return new SpiBodyAdvice(defaultObjectMapper, doudianObjectMapper);
     }
 
 }
