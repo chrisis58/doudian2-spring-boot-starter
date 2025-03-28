@@ -31,7 +31,7 @@ public class DoudianJacksonConfig {
     @Bean
     @Primary
     @ConditionalOnMissingBean(name = "objectMapper")
-    @Qualifier("defaultObjectMapper")
+    @Qualifier("objectMapper")
     public ObjectMapper defaultObjectMapper(Jackson2ObjectMapperBuilderCustomizer customizer) {
         Jackson2ObjectMapperBuilder jackson2ObjectMapperBuilder = new Jackson2ObjectMapperBuilder();
         customizer.customize(jackson2ObjectMapperBuilder);
