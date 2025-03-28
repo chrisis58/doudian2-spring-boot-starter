@@ -1,41 +1,53 @@
 package cn.teacy.doudian.register;
 
 
+import cn.hutool.core.annotation.AnnotationUtil;
 import cn.teacy.common.annotation.SpiEndpoint;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
-@Getter
 @Slf4j
-public class SpiServiceRegistry {
+public class SpiServiceRegistry implements ApplicationListener<ApplicationReadyEvent> {
 
     private static final String BASE_PACKAGE = "cn.teacy.doudian";
     private static final ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
 
+    private final Set<String> basePackages = new HashSet<>();
+
+    @Getter
     private final Set<String> spiRoutes = new HashSet<>();
+
+    @Getter
     private final Set<Class<?>> responseClasses = new HashSet<>();
 
-    public SpiServiceRegistry(String[] additionalPackages) {
+    public SpiServiceRegistry() {
         scanner.addIncludeFilter(new AnnotationTypeFilter(RestController.class));
         scanner.addIncludeFilter(new AnnotationTypeFilter(SpiEndpoint.class));
 
-        scanSpiEndpoints(BASE_PACKAGE);
+        basePackages.add(BASE_PACKAGE);
+    }
 
-        for (String additionalPackage : additionalPackages) {
-            scanSpiEndpoints(additionalPackage);
-        }
+    public SpiServiceRegistry(String[] additionalPackages) {
+        this();
+        basePackages.addAll(Arrays.asList(additionalPackages));
+    }
 
-        log.info("{} SPI endpoints registered: {}", spiRoutes.size(), spiRoutes);
-        log.info("{} response classes registered: {}", responseClasses.size(), responseClasses);
+    public SpiServiceRegistry(Collection<String> additionalPackages) {
+        this();
+        basePackages.addAll(additionalPackages);
     }
 
     private void scanSpiEndpoints(String basePackage) {
@@ -67,4 +79,20 @@ public class SpiServiceRegistry {
         });
     }
 
+    @Override
+    public void onApplicationEvent(ApplicationReadyEvent event) {
+        Object source = event.getSpringApplication().getAllSources().iterator().next();
+        if (source instanceof Class<?> mainConfigClass) {
+            String[] packages = Optional.ofNullable(AnnotatedElementUtils.findMergedAnnotation(mainConfigClass, ComponentScan.class))
+                    .map(ComponentScan::basePackages)
+                    .orElseGet(() -> new String[]{mainConfigClass.getPackageName()});
+            basePackages.addAll(Arrays.asList(packages));
+        }
+
+        log.debug("Scanning SPI endpoints in base packages: {}", basePackages);
+        basePackages.forEach(this::scanSpiEndpoints);
+
+        log.info("{} SPI endpoints registered: {}", spiRoutes.size(), spiRoutes);
+        log.info("{} response classes registered: {}", responseClasses.size(), responseClasses);
+    }
 }
