@@ -4,8 +4,8 @@ package cn.teacy.doudian.register;
 import cn.teacy.common.annotation.SpiEndpoint;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.ApplicationListener;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -17,12 +17,10 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 @Slf4j
-public class SpiServiceRegistry implements ApplicationListener<ApplicationReadyEvent> {
+public class SpiServiceRegistry {
 
     private static final String BASE_PACKAGE = "cn.teacy.doudian";
-    private static final ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
-
-    private final Set<String> basePackages = new HashSet<>();
+    private final ClassPathScanningCandidateComponentProvider scanner;
 
     @Getter
     private final Set<String> spiRoutes = new HashSet<>();
@@ -30,21 +28,29 @@ public class SpiServiceRegistry implements ApplicationListener<ApplicationReadyE
     @Getter
     private final Set<Class<?>> responseClasses = new HashSet<>();
 
-    public SpiServiceRegistry() {
+    public SpiServiceRegistry(ApplicationContext applicationContext, String[] additionalPackages) {
+        scanner = new ClassPathScanningCandidateComponentProvider(false);
         scanner.addIncludeFilter(new AnnotationTypeFilter(RestController.class));
         scanner.addIncludeFilter(new AnnotationTypeFilter(SpiEndpoint.class));
 
+        Set<String> basePackages = new HashSet<>();
         basePackages.add(BASE_PACKAGE);
-    }
-
-    public SpiServiceRegistry(String[] additionalPackages) {
-        this();
         basePackages.addAll(Arrays.asList(additionalPackages));
-    }
 
-    public SpiServiceRegistry(Collection<String> additionalPackages) {
-        this();
-        basePackages.addAll(additionalPackages);
+        Map<String, Object> beans = applicationContext.getBeansWithAnnotation(SpringBootApplication.class);
+        for (Object bean : beans.values()) {
+            Class<?> mainApplicationClass = bean.getClass();
+            String[] packages = Optional.ofNullable(AnnotatedElementUtils.findMergedAnnotation(mainApplicationClass, ComponentScan.class))
+                    .map(ComponentScan::basePackages)
+                    .orElseGet(() -> new String[]{mainApplicationClass.getPackageName()});
+            basePackages.addAll(Arrays.asList(packages));
+        }
+
+        log.debug("Scanning SPI endpoints in base packages: {}", basePackages);
+        basePackages.forEach(this::scanSpiEndpoints);
+
+        log.info("{} SPI endpoints registered: {}", spiRoutes.size(), spiRoutes);
+        log.info("{} response classes registered: {}", responseClasses.size(), responseClasses);
     }
 
     private void scanSpiEndpoints(String basePackage) {
@@ -76,20 +82,4 @@ public class SpiServiceRegistry implements ApplicationListener<ApplicationReadyE
         });
     }
 
-    @Override
-    public void onApplicationEvent(ApplicationReadyEvent event) {
-        Object source = event.getSpringApplication().getAllSources().iterator().next();
-        if (source instanceof Class<?> mainConfigClass) {
-            String[] packages = Optional.ofNullable(AnnotatedElementUtils.findMergedAnnotation(mainConfigClass, ComponentScan.class))
-                    .map(ComponentScan::basePackages)
-                    .orElseGet(() -> new String[]{mainConfigClass.getPackageName()});
-            basePackages.addAll(Arrays.asList(packages));
-        }
-
-        log.debug("Scanning SPI endpoints in base packages: {}", basePackages);
-        basePackages.forEach(this::scanSpiEndpoints);
-
-        log.info("{} SPI endpoints registered: {}", spiRoutes.size(), spiRoutes);
-        log.info("{} response classes registered: {}", responseClasses.size(), responseClasses);
-    }
 }

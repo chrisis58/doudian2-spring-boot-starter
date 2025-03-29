@@ -11,6 +11,7 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 @ConditionalOnClass(SpiServiceRegistry.class)
@@ -22,9 +23,13 @@ public class DoudianSpiConfig {
 
     @Bean
     public SpiServiceRegistry spiServiceRegistry(
+            ApplicationContext applicationContext,
             DoudianProperties doudianProperties
     ) {
-        return new SpiServiceRegistry(doudianProperties.getAdditionalPackages());
+        return new SpiServiceRegistry(
+                applicationContext,
+                doudianProperties.getAdditionalPackages()
+        );
     }
 
     @Bean
