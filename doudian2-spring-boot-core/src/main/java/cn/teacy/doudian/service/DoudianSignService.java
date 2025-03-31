@@ -10,7 +10,7 @@ import cn.teacy.common.util.MarshalUtil;
 import cn.teacy.common.util.SignUtil;
 import cn.teacy.doudian.token.AccessTokenRetriever;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.core.annotation.AnnotationUtils;
 
 import java.util.Optional;
 
@@ -44,7 +44,7 @@ public class DoudianSignService implements ISignService {
         );
 
         if (Optional.ofNullable(
-                        AnnotatedElementUtils.findMergedAnnotation(apiRequest.getClass(), OpParam.class)
+                        AnnotationUtils.findAnnotation(apiRequest.getClass(), OpParam.class)
                 ).map(OpParam::needToken)
                 .orElse(true)
         ) {
@@ -60,7 +60,7 @@ public class DoudianSignService implements ISignService {
 
     public <P> ApiRequest<P> sign(P apiParam) {
         String method = Optional.ofNullable(
-                        AnnotatedElementUtils.findMergedAnnotation(apiParam.getClass(), OpParam.class)
+                        AnnotationUtils.findAnnotation(apiParam.getClass(), OpParam.class)
                 ).map(OpParam::method)
                 .orElseThrow(() -> new IllegalArgumentException(
                         "使用此方法必须使用 @OpParam 注解，并提供 method 值"
