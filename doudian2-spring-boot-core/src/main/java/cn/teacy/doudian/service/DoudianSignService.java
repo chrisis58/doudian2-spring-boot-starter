@@ -44,7 +44,7 @@ public class DoudianSignService implements ISignService {
         );
 
         if (Optional.ofNullable(
-                        AnnotationUtils.findAnnotation(apiRequest.getClass(), OpParam.class)
+                        AnnotationUtils.findAnnotation(apiRequest.getParam().getClass(), OpParam.class)
                 ).map(OpParam::needToken)
                 .orElse(true)
         ) {
