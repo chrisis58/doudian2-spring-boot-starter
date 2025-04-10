@@ -1,5 +1,6 @@
 package cn.teacy.doudian.client;
 
+import cn.teacy.common.annotation.SkipLog;
 import cn.teacy.common.doudian.api.CommonResponse;
 import cn.teacy.doudian.annotation.DoudianApiClient;
 import cn.teacy.doudian.domain.request.CreateTokenParam;
@@ -18,6 +19,7 @@ public interface CommonClient {
      * @see <a href="https://connect.douyinec.com/view/doc/-1000/-1000/-1000">生成token API</a>
      */
     @PostMapping("/token/create")
+    @SkipLog(false)
     CommonResponse<CreateTokenResponse> createToken(CreateTokenParam createTokenParam);
 
 
@@ -34,6 +36,7 @@ public interface CommonClient {
      * @see <a href="https://connect.douyinec.com/view/doc/-1000/-1000/-1001">使用refresh_token刷新access_token</a>
      */
     @PostMapping("/token/refresh")
+    @SkipLog(false)
     CommonResponse<RefreshTokenResponse> refreshToken(RefreshTokenParam refreshTokenParam);
 
 }

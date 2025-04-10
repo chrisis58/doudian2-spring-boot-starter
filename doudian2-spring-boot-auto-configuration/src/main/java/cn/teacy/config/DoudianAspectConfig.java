@@ -1,6 +1,7 @@
 package cn.teacy.config;
 
 import cn.teacy.common.property.DoudianProperties;
+import cn.teacy.doudian.aspect.ApiRequestLogAspect;
 import cn.teacy.doudian.aspect.ClientRetryAspect;
 import cn.teacy.doudian.aspect.SpiAccessLogAspect;
 import cn.teacy.doudian.persistent.InteractLogPersistent;
@@ -32,6 +33,13 @@ public class DoudianAspectConfig {
             InteractLogPersistent persistent
     ) {
         return new SpiAccessLogAspect(persistent);
+    }
+
+    @Bean
+    public ApiRequestLogAspect apiRequestLogAspect(
+            InteractLogPersistent persistent
+    ) {
+        return new ApiRequestLogAspect(persistent);
     }
 
 }
