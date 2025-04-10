@@ -2,6 +2,8 @@ package cn.teacy.config;
 
 
 import cn.teacy.common.interfaces.SupplierRegistry;
+import cn.teacy.common.register.RetryableHandlerRegistry;
+import cn.teacy.doudian.handler.TokenRetryHandler;
 import cn.teacy.doudian.persistent.InteractLogPersistent;
 import cn.teacy.doudian.service.HashSupplierRegistry;
 import cn.teacy.doudian.token.AccessTokenHolder;
@@ -13,6 +15,7 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.DependsOn;
 
 import java.util.Date;
 
@@ -53,6 +56,16 @@ public class DoudianDefaultConfig {
         supplierRegistry.register("date", () -> DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
 
         return supplierRegistry;
+    }
+
+    @Bean
+    @DependsOn({"accessTokenHolder", "refreshTokenHolder"})
+    public RetryableHandlerRegistry retryableHandlerRegistry(
+            AccessTokenHolder accessTokenHolder,
+            RefreshTokenHolder refreshTokenHolder
+    ) {
+        return new RetryableHandlerRegistry()
+                .addHandler(new TokenRetryHandler(accessTokenHolder, refreshTokenHolder));
     }
 
 }

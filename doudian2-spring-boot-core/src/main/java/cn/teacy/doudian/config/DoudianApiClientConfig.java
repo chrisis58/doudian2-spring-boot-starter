@@ -4,11 +4,10 @@ package cn.teacy.doudian.config;
 import cn.teacy.common.interfaces.ISignService;
 import cn.teacy.common.interfaces.SupplierRegistry;
 import cn.teacy.common.property.DoudianApiProperties;
+import cn.teacy.common.register.RetryableHandlerRegistry;
 import cn.teacy.doudian.codec.DoudianApiDecoder;
 import cn.teacy.doudian.codec.DoudianApiEncoder;
 import cn.teacy.doudian.interceptor.DoudianRequestInterceptor;
-import cn.teacy.doudian.token.AccessTokenHolder;
-import cn.teacy.doudian.token.RefreshTokenHolder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.RequestInterceptor;
 import feign.codec.Decoder;
@@ -39,10 +38,9 @@ public class DoudianApiClientConfig {
     @Bean
     public Decoder doudianDecoder(
             @Qualifier("doudianObjectMapper") ObjectMapper objectMapper,
-            AccessTokenHolder accessTokenHolder,
-            RefreshTokenHolder refreshTokenHolder
+            RetryableHandlerRegistry registry
     ) {
-        return new DoudianApiDecoder(objectMapper, accessTokenHolder, refreshTokenHolder);
+        return new DoudianApiDecoder(objectMapper, registry);
     }
 
     @Bean
