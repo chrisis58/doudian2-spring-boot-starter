@@ -45,14 +45,19 @@ public class DoudianApiDecoder implements Decoder {
         JavaType javaType = objectMapper.getTypeFactory().constructType(type);
         CommonResponse<?> commonResponse = objectMapper.readValue(body, javaType);
 
-        if (!ApiResponseConstant.StatusCode.OK.equals(commonResponse.getCode())) {
+        if (!ApiResponseConstant.StatusCode.OK.getCode().equals(commonResponse.getCode())) {
             log.warn("API response error: {}", commonResponse);
         }
 
-        if (ApiResponseConstant.StatusCode.ACCESS_TOKEN_NOT_EXIST.equals(commonResponse.getCode())) {
+        if (ApiResponseConstant.SubStatus.ACCESS_TOKEN_NOT_EXIST.getSubCode().equals(commonResponse.getSubCode())
+                || ApiResponseConstant.SubStatus.ACCESS_TOKEN_EXPIRED.getSubCode().equals(commonResponse.getSubCode())
+        ) {
             accessTokenHolder.clear();
             throw new InvalidAccessTokenException(response.request());
-        } else if (ApiResponseConstant.StatusCode.REFRESH_TOKEN_NOT_EXIST.equals(commonResponse.getCode())) {
+        } else if (
+                ApiResponseConstant.SubStatus.REFRESH_TOKEN_NOT_EXIST.getSubCode().equals(commonResponse.getSubCode())
+        ) {
+            accessTokenHolder.clear();
             refreshTokenHolder.clear();
             throw new InvalidRefreshTokenException(response.request());
         }
