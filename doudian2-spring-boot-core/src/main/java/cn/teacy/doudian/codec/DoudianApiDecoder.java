@@ -4,6 +4,7 @@ import cn.teacy.common.constant.ApiResponseConstant;
 import cn.teacy.common.doudian.api.CommonResponse;
 import cn.teacy.common.exception.InvalidAccessTokenException;
 import cn.teacy.common.exception.InvalidRefreshTokenException;
+import cn.teacy.common.holder.InteractLogContextHolder;
 import cn.teacy.doudian.token.AccessTokenHolder;
 import cn.teacy.doudian.token.RefreshTokenHolder;
 import com.fasterxml.jackson.databind.JavaType;
@@ -41,6 +42,7 @@ public class DoudianApiDecoder implements Decoder {
     @Override
     public Object decode(Response response, Type type) throws FeignException {
         String body = StreamUtils.copyToString(response.body().asInputStream(), StandardCharsets.UTF_8);
+        InteractLogContextHolder.setResponseBody(body);
 
         JavaType javaType = objectMapper.getTypeFactory().constructType(type);
         CommonResponse<?> commonResponse = objectMapper.readValue(body, javaType);

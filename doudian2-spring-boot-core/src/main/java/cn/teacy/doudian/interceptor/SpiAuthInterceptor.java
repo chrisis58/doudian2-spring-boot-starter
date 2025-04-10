@@ -5,13 +5,14 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.teacy.common.constant.SpiResponseConstant;
 import cn.teacy.common.doudian.api.CommonResponse;
-import cn.teacy.common.doudian.domain.SpiAccessLog;
-import cn.teacy.common.holder.SpiContextHolder;
+import cn.teacy.common.doudian.domain.InteractLog;
+import cn.teacy.common.holder.InteractLogContextHolder;
 import cn.teacy.common.util.MarshalUtil;
 import cn.teacy.common.util.SignUtil;
-import cn.teacy.doudian.persistent.SpiAccessLogPersistent;
+import cn.teacy.doudian.persistent.InteractLogPersistent;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -20,24 +21,18 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
+@RequiredArgsConstructor
 public class SpiAuthInterceptor implements HandlerInterceptor {
 
     private final String appKey;
     private final String appSecret;
-    private final SpiAccessLogPersistent persistent;
-
-    public SpiAuthInterceptor(
-            String appKey,
-            String appSecret,
-            SpiAccessLogPersistent persistent
-    ) {
-        this.appKey = appKey;
-        this.appSecret = appSecret;
-        this.persistent = persistent;
-    }
+    private final InteractLogPersistent persistent;
 
     private static final CommonResponse<Object> AUTH_FAILED_RESPONSE = new CommonResponse<>(
             SpiResponseConstant.StatusCode.PARAM_ERROR.getCode(), // TODO: 修改为 SPI 的验签失败错误码
@@ -50,14 +45,7 @@ public class SpiAuthInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-
-        String logId = request.getHeader("logId");
-        SpiContextHolder.setLogId(logId);
-
-        if (StrUtil.isNotBlank(logId)) {
-            log.debug("SPI request received, logId: {}, uri: {}, method: {}",
-                    logId, request.getRequestURI(), request.getMethod());
-        }
+        setInteractContext(request);
 
         String appKey = request.getParameter("app_key");
 
@@ -83,6 +71,7 @@ public class SpiAuthInterceptor implements HandlerInterceptor {
         String paramJson = "GET".equalsIgnoreCase(request.getMethod())
                 ? request.getParameter("param_json")
                 : IoUtil.read(request.getReader());
+        InteractLogContextHolder.setRequestBody(paramJson);
 
         String localSign = SignUtil.signForValidate(appKey, appSecret, paramJson, timestamp, signMethod);
         if (!StrUtil.equals(sign, localSign, true)) {
@@ -102,6 +91,23 @@ public class SpiAuthInterceptor implements HandlerInterceptor {
         return zonedDateTime.toEpochSecond();
     }
 
+    private void setInteractContext(HttpServletRequest request) {
+        String logId = request.getHeader("Log-id");
+        InteractLogContextHolder.setLogId(logId);
+        InteractLogContextHolder.setRoute(request.getRequestURI());
+        InteractLogContextHolder.setLogId(logId);
+        Map<String, String> queryMap = request.getParameterMap()
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> Arrays.stream(entry.getValue())
+                                .map(value -> StrUtil.sub(value, 0, 100))
+                                .collect(Collectors.joining(","))
+                ));
+        InteractLogContextHolder.setRequestBody(queryMap.toString());
+    }
+
     private void writeResponse(HttpServletResponse response, String message) throws IOException {
         response.setStatus(200);
         response.setContentType("application/json");
@@ -114,12 +120,11 @@ public class SpiAuthInterceptor implements HandlerInterceptor {
 
         response.getWriter().write(responseBody);
 
-        persistent.save(SpiAccessLog.builder()
-                .logId(SpiContextHolder.getLogId())
-                .request("")
-                .response(responseBody)
-                .build());
-        SpiContextHolder.setLogId(null);
+        try {
+            persistent.save(InteractLog.fromContext(InteractLog.Type.API));
+        } finally {
+            InteractLogContextHolder.clearAll();
+        }
     }
 
 }

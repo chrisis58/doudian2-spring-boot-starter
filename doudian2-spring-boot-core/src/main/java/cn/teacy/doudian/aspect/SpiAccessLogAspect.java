@@ -1,10 +1,10 @@
 package cn.teacy.doudian.aspect;
 
 import cn.teacy.common.annotation.SpiEndpoint;
-import cn.teacy.common.doudian.domain.SpiAccessLog;
-import cn.teacy.common.holder.SpiContextHolder;
+import cn.teacy.common.doudian.domain.InteractLog;
+import cn.teacy.common.holder.InteractLogContextHolder;
 import cn.teacy.common.util.MarshalUtil;
-import cn.teacy.doudian.persistent.SpiAccessLogPersistent;
+import cn.teacy.doudian.persistent.InteractLogPersistent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -22,7 +22,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class SpiAccessLogAspect {
 
-    private final SpiAccessLogPersistent persistent;
+    private final InteractLogPersistent persistent;
 
     @Around("@annotation(cn.teacy.common.annotation.SpiEndpoint) || @within(cn.teacy.common.annotation.SpiEndpoint)")
     public Object saveLog(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -36,20 +36,23 @@ public class SpiAccessLogAspect {
                         joinPoint.getTarget().getClass().getAnnotation(SpiEndpoint.class)
                 );
 
-        Object result = joinPoint.proceed();
+        Object result = null;
+        Throwable throwable = null;
+
+        try {
+            result = joinPoint.proceed();
+        } catch (Throwable e) {
+            throwable = e;
+            log.error("Access log error: ", e);
+        }
 
         if (Objects.isNull(endpoint) || !endpoint.saveLog()) {
-            if (Objects.isNull(endpoint)) {
-                log.warn("SpiEndpoint annotation not found, skip save log");
-            }
-
-            return result;
+            log.debug("Access log skip, endpoint: {}", endpoint);
+            return returnValue(result, throwable);
         }
 
         try {
-            String logId = SpiContextHolder.getLogId();
-
-            log.info("Access Log: {}, LogId: {}", endpoint.value(), logId);
+            log.info("Access Log: {}, LogId: {}", endpoint.value(), InteractLogContextHolder.getLogId());
 
             String requestBody = Arrays.stream(joinPoint.getArgs()).filter(
                             arg -> !arg.getClass().isAnnotationPresent(RequestBody.class)
@@ -61,17 +64,20 @@ public class SpiAccessLogAspect {
 
             log.debug("Request: {}, Response: {}", requestBody, responseBody);
 
-            persistent.save(SpiAccessLog.builder()
-                    .logId(logId)
-                    .request(requestBody)
-                    .response(responseBody)
-                    .build());
+            persistent.save(InteractLog.fromContext(InteractLog.Type.SPI));
         } catch (Exception e) {
-            log.error("Save access log failed", e);
+            log.error("Save access log failed: ", e);
         } finally {
-            SpiContextHolder.setLogId(null);
+            InteractLogContextHolder.clearAll();
         }
 
+        return returnValue(result, throwable);
+    }
+
+    private Object returnValue(Object result, Throwable throwable) throws Throwable {
+        if (Objects.nonNull(throwable)) {
+            throw throwable;
+        }
         return result;
     }
 

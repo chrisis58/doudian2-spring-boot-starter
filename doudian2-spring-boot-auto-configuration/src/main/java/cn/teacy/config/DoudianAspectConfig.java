@@ -3,7 +3,7 @@ package cn.teacy.config;
 import cn.teacy.common.property.DoudianProperties;
 import cn.teacy.doudian.aspect.ClientRetryAspect;
 import cn.teacy.doudian.aspect.SpiAccessLogAspect;
-import cn.teacy.doudian.persistent.SpiAccessLogPersistent;
+import cn.teacy.doudian.persistent.InteractLogPersistent;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -29,7 +29,7 @@ public class DoudianAspectConfig {
 
     @Bean
     public SpiAccessLogAspect spiAccessLogAspect(
-            SpiAccessLogPersistent persistent
+            InteractLogPersistent persistent
     ) {
         return new SpiAccessLogAspect(persistent);
     }

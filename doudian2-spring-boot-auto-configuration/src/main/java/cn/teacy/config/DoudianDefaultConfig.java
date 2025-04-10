@@ -2,7 +2,7 @@ package cn.teacy.config;
 
 
 import cn.teacy.common.interfaces.SupplierRegistry;
-import cn.teacy.doudian.persistent.SpiAccessLogPersistent;
+import cn.teacy.doudian.persistent.InteractLogPersistent;
 import cn.teacy.doudian.service.HashSupplierRegistry;
 import cn.teacy.doudian.token.AccessTokenHolder;
 import cn.teacy.doudian.token.RefreshTokenHolder;
@@ -19,7 +19,7 @@ import java.util.Date;
 @ConditionalOnClass({
         AccessTokenHolder.class,
         RefreshTokenHolder.class,
-        SpiAccessLogPersistent.class,
+        InteractLogPersistent.class,
         SupplierRegistry.class
 })
 @AutoConfiguration
@@ -40,8 +40,8 @@ public class DoudianDefaultConfig {
 
     @Bean
     @ConditionalOnMissingBean
-    public SpiAccessLogPersistent spiAccessLogPersistent() {
-        return new SpiAccessLogPersistent.JUST_LOG();
+    public InteractLogPersistent interactLogPersistent() {
+        return new InteractLogPersistent.JUST_LOG();
     }
 
     @Bean

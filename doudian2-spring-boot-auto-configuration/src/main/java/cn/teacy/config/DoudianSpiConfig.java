@@ -3,7 +3,7 @@ package cn.teacy.config;
 import cn.teacy.common.property.DoudianProperties;
 import cn.teacy.doudian.advice.SpiBodyAdvice;
 import cn.teacy.doudian.interceptor.SpiAuthInterceptor;
-import cn.teacy.doudian.persistent.SpiAccessLogPersistent;
+import cn.teacy.doudian.persistent.InteractLogPersistent;
 import cn.teacy.doudian.register.SpiServiceRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -36,12 +36,12 @@ public class DoudianSpiConfig {
     @ConditionalOnMissingBean
     public SpiAuthInterceptor spiAuthInterceptor(
             DoudianProperties doudianProperties,
-            SpiAccessLogPersistent spiAccessLogPersistent
+            InteractLogPersistent interactLogPersistent
     ) {
         return new SpiAuthInterceptor(
                 doudianProperties.getAppKey(),
                 doudianProperties.getAppSecret(),
-                spiAccessLogPersistent
+                interactLogPersistent
         );
     }
 
