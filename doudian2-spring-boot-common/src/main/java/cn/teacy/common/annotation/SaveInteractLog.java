@@ -10,13 +10,13 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Inherited
-public @interface SkipLog {
+public @interface SaveInteractLog {
 
     /**
-     * 是否跳过日志记录
+     * 是否保存交互日志
      *
      * @return true 跳过，false 不跳过
      */
-    boolean value() default false;
+    boolean value() default true;
 
 }

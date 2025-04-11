@@ -1,6 +1,6 @@
 package cn.teacy.doudian.aspect;
 
-import cn.teacy.common.annotation.SkipLog;
+import cn.teacy.common.annotation.SaveInteractLog;
 import cn.teacy.common.doudian.domain.InteractLog;
 import cn.teacy.common.holder.InteractLogContextHolder;
 import cn.teacy.common.util.MarshalUtil;
@@ -29,12 +29,12 @@ public class ApiRequestLogAspect {
     public Object logApiRequest(ProceedingJoinPoint joinPoint) throws Throwable {
 
         // 获取注解
-        SkipLog skipLog = Optional.ofNullable(
+        SaveInteractLog saveInteractLog = Optional.ofNullable(
                         (MethodSignature) joinPoint.getSignature()
                 ).map(MethodSignature::getMethod)
-                .map(m -> AnnotatedElementUtils.findMergedAnnotation(m, SkipLog.class))
+                .map(m -> AnnotatedElementUtils.findMergedAnnotation(m, SaveInteractLog.class))
                 .orElseGet(() ->
-                        AnnotatedElementUtils.findMergedAnnotation(joinPoint.getTarget().getClass(), SkipLog.class)
+                        AnnotatedElementUtils.findMergedAnnotation(joinPoint.getTarget().getClass(), SaveInteractLog.class)
                 );
 
         Object result = null;
@@ -46,7 +46,7 @@ public class ApiRequestLogAspect {
             log.error("API request failed", e);
         }
 
-        if (Objects.nonNull(skipLog) && skipLog.value()) {
+        if (Objects.nonNull(saveInteractLog) && !saveInteractLog.value()) {
             log.debug("Skip log for this request");
             return returnValue(result, throwable);
         }

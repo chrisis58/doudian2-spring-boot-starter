@@ -1,5 +1,7 @@
 package cn.teacy.common.annotation;
 
+import org.springframework.core.annotation.AliasFor;
+
 import java.lang.annotation.*;
 
 /**
@@ -12,6 +14,7 @@ import java.lang.annotation.*;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE})
+@SaveInteractLog
 public @interface SpiEndpoint {
 
     /**
@@ -22,6 +25,7 @@ public @interface SpiEndpoint {
     /**
      * 是否保存日志
      */
+    @AliasFor(annotation = SaveInteractLog.class, attribute = "value")
     boolean saveLog() default true;
 
 }

@@ -1,6 +1,6 @@
 package cn.teacy.doudian.annotation;
 
-import cn.teacy.common.annotation.SkipLog;
+import cn.teacy.common.annotation.SaveInteractLog;
 import cn.teacy.common.constant.DoudianApiConstant;
 import cn.teacy.doudian.config.DoudianApiClientConfig;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -12,7 +12,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 @FeignClient
-@SkipLog
+@SaveInteractLog
 public @interface DoudianApiClient {
 
     @AliasFor(annotation = FeignClient.class)
@@ -48,7 +48,7 @@ public @interface DoudianApiClient {
     @AliasFor(annotation = FeignClient.class)
     boolean primary() default true;
 
-    @AliasFor(annotation = SkipLog.class, value = "value")
+    @AliasFor(annotation = SaveInteractLog.class, value = "value")
     boolean saveLog() default true;
 
 }
