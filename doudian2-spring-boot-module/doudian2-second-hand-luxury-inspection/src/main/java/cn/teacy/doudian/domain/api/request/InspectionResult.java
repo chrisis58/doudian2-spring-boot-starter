@@ -36,7 +36,7 @@ public class InspectionResult {
             desc = "质检结果图片url,最多上传50张，图片大小不超过2MB。",
             example = "http://xxxx"
     )
-    private List<String> imageUrl = Collections.emptyList();
+    private List<String> imgUrl = Collections.emptyList();
     @OpField(
             required = false,
             desc = "质检结果枚举，1-合格，2-不合格",
