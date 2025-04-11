@@ -6,6 +6,6 @@ public interface SupplierRegistry<K, V> {
 
     V eval(K index);
 
-    void register(K index, Supplier<V> supplier);
+    SupplierRegistry<K, V> register(K index, Supplier<V> supplier);
 
 }

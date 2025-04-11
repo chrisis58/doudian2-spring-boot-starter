@@ -5,7 +5,7 @@ import cn.teacy.common.interfaces.SupplierRegistry;
 import cn.teacy.common.register.RetryableHandlerRegistry;
 import cn.teacy.doudian.handler.TokenRetryHandler;
 import cn.teacy.doudian.persistent.InteractLogPersistent;
-import cn.teacy.doudian.service.HashSupplierRegistry;
+import cn.teacy.common.register.HashSupplierRegistry;
 import cn.teacy.doudian.token.AccessTokenHolder;
 import cn.teacy.doudian.token.RefreshTokenHolder;
 import lombok.RequiredArgsConstructor;
