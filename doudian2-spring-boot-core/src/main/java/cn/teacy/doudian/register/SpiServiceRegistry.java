@@ -2,7 +2,6 @@ package cn.teacy.doudian.register;
 
 
 import cn.teacy.common.annotation.SpiEndpoint;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class SpiServiceRegistry {
@@ -22,10 +22,8 @@ public class SpiServiceRegistry {
     private static final String BASE_PACKAGE = "cn.teacy.doudian";
     private final ClassPathScanningCandidateComponentProvider scanner;
 
-    @Getter
     private final Set<String> spiRoutes = new HashSet<>();
 
-    @Getter
     private final Set<Class<?>> responseClasses = new HashSet<>();
 
     public SpiServiceRegistry(ApplicationContext applicationContext, String[] additionalPackages) {
@@ -80,6 +78,14 @@ public class SpiServiceRegistry {
                 log.error(e.getMessage());
             }
         });
+    }
+
+    public Set<String> getSpiRoutes() {
+        return spiRoutes.stream().collect(Collectors.toUnmodifiableSet());
+    }
+
+    public Set<Class<?>> getResponseClasses() {
+        return responseClasses.stream().collect(Collectors.toUnmodifiableSet());
     }
 
 }
