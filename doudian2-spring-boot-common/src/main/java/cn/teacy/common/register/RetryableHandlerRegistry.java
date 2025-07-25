@@ -24,6 +24,12 @@ public class RetryableHandlerRegistry {
         return this;
     }
 
+    public RetryableHandlerRegistry clearHandlers() {
+        handlers.clear();
+        evictCache();
+        return this;
+    }
+
     public Set<RetryableResponseHandler> getHandlers() {
         if (cachedHandlers == null) {
             cachedHandlers = handlers.stream().collect(Collectors.toUnmodifiableSet());

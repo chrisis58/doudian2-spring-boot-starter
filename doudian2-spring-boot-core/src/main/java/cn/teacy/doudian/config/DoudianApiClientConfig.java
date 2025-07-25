@@ -27,7 +27,7 @@ public class DoudianApiClientConfig {
     @Bean
     public RequestInterceptor requestInterceptor(
             DoudianApiProperties doudianApiProperties,
-            @Qualifier("requestHeadersSupplierRegistry")SupplierRegistry<String, String> supplierRegistry
+            @Qualifier("requestHeadersSupplierRegistry") SupplierRegistry<String, String> supplierRegistry
     ) {
         return new DoudianRequestInterceptor(
                 doudianApiProperties.getRequestHeaders(),
