@@ -80,12 +80,12 @@ public class SpiServiceRegistry {
         });
     }
 
-    public Set<String> getSpiRoutes() {
-        return spiRoutes.stream().collect(Collectors.toUnmodifiableSet());
+    public List<String> getSpiRoutes() {
+        return spiRoutes.stream().distinct().toList();
     }
 
-    public Set<Class<?>> getResponseClasses() {
-        return responseClasses.stream().collect(Collectors.toUnmodifiableSet());
+    public List<Class<?>> getResponseClasses() {
+        return responseClasses.stream().distinct().toList();
     }
 
 }
