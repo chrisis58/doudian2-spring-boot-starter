@@ -47,7 +47,7 @@ public interface AccessTokenRetriever extends TokenRetriever<String> {
                 // 如果有refreshToken，使用refreshToken刷新accessToken
                 CommonResponse<RefreshTokenResponse> commonResponse = commonClient.refreshToken(new RefreshTokenParam(refreshToken));
 
-                if (ApiResponseConstant.StatusCode.OK.equals(commonResponse.getCode())) {
+                if (ApiResponseConstant.StatusCode.OK.getCode().equals(commonResponse.getCode())) {
                     RefreshTokenResponse data = commonResponse.getData();
 
                     String newAccessToken = data.getAccessToken();
