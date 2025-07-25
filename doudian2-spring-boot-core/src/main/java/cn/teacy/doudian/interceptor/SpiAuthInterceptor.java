@@ -66,7 +66,7 @@ public class SpiAuthInterceptor implements HandlerInterceptor {
 
         String sign = request.getParameter("sign");
         String signMethod = Optional.ofNullable(request.getParameter("sign_method"))
-                .orElseGet(() -> "md5"); // 文档里写的是默认 md5
+                .orElse("md5"); // 文档里写的是默认 md5
 
         String paramJson = "GET".equalsIgnoreCase(request.getMethod())
                 ? request.getParameter("param_json")
@@ -95,7 +95,6 @@ public class SpiAuthInterceptor implements HandlerInterceptor {
         String logId = request.getHeader("Log-id");
         InteractLogContextHolder.setLogId(logId);
         InteractLogContextHolder.setRoute(request.getRequestURI());
-        InteractLogContextHolder.setLogId(logId);
         Map<String, String> queryMap = request.getParameterMap()
                 .entrySet()
                 .stream()
