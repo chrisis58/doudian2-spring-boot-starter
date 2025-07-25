@@ -29,7 +29,8 @@ public class ClientRetryAspect {
                 attempt++;
                 log.warn("Retry attempt {} for {} failed due to: {}", attempt, joinPoint.getSignature().toShortString(), retryableException.getMessage());
                 log.debug("Stack trace: ", retryableException);
-                Thread.sleep(Optional.ofNullable(retryableException.retryAfter()).orElse((attempt + 1) * DEFAULT_RETRY_DELAY));
+                Thread.sleep(Optional.ofNullable(retryableException.retryAfter())
+                        .orElse(0L) + DEFAULT_RETRY_DELAY * (attempt + 1));
             }
         }
 
